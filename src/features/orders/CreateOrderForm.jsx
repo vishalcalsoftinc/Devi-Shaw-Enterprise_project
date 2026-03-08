@@ -10,6 +10,8 @@ import Spinner from "../../ui/Spinner";
 import Select from "../../ui/Select";
 import styled from "styled-components";
 import CreateOrderItem from "./CreateOrderItem";
+import DateRangeSelector from "../../ui/DateRangeSelector";
+import TimeSelector from "../../ui/TimeSelector";
 
 import { useCustomers } from "../customers/useCustomers";
 import { useStock } from "../stock/useStock";
@@ -28,6 +30,13 @@ const StackedButtons = styled.div`
   display: flex;
   justify-content: flex-end;
   gap: 1rem;
+`;
+
+const DateTimeGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  gap: 1rem;
+  align-items: end;
 `;
 const order_template = {
   customer_id: 1,
@@ -80,6 +89,12 @@ function CreateOrderForm({ onCloseModal, store_id = "1" }) {
     customer_id: Number(store_id),
   });
   const [orderDate, setOrderDate] = useState(fromToday(0));
+  const [orderDateValue, setOrderDateValue] = useState(
+    fromToday(0).split("T")[0]
+  );
+  const [orderTimeValue, setOrderTimeValue] = useState(
+    fromToday(0).split("T")[1]?.slice(0, 5) || "00:00"
+  );
   const [extraFree500ml, setExtraFree500ml] = useState(0);
   const [extraFree1ltr, setExtraFree1ltr] = useState(0);
   const [extraDiscount, setExtraDiscount] = useState(0);
@@ -144,9 +159,22 @@ function CreateOrderForm({ onCloseModal, store_id = "1" }) {
     setNewOrder({ ...newOrder, customer_id: Number(event.target.value) });
   };
 
-  const handleOrderDateChange = (event) => {
-    setOrderDate(event.target.value);
-    setNewOrder({ ...newOrder, order_date: event.target.value });
+  const updateOrderDateTime = (dateValue, timeValue) => {
+    const nextDate = dateValue || orderDateValue;
+    const nextTime = timeValue || orderTimeValue || "00:00";
+    const combined = `${nextDate}T${nextTime}:00`;
+    setOrderDate(combined);
+    setNewOrder((current) => ({ ...current, order_date: combined }));
+  };
+
+  const handleOrderDateChange = (value) => {
+    setOrderDateValue(value);
+    updateOrderDateTime(value, orderTimeValue);
+  };
+
+  const handleOrderTimeChange = (value) => {
+    setOrderTimeValue(value);
+    updateOrderDateTime(orderDateValue, value);
   };
 
   function handleExtra500mlChange(e) {
@@ -316,13 +344,25 @@ function CreateOrderForm({ onCloseModal, store_id = "1" }) {
         />
       </FormRow>
 
-      <FormRow label={"Order date"}>
-        <Input
-          type="text"
-          value={orderDate}
-          onChange={(e) => handleOrderDateChange(e)}
-          disabled={!isAdmin}
-        />
+      <FormRow label={"Order date & time"}>
+        <DateTimeGrid>
+          <DateRangeSelector
+            startDate={orderDateValue}
+            onStartDateChange={handleOrderDateChange}
+            showEndDate={false}
+            showActions={false}
+            startLabel="Order date"
+            showLabels={false}
+            disabled={!isAdmin}
+          />
+          <TimeSelector
+            label="Order time"
+            value={orderTimeValue}
+            onChange={handleOrderTimeChange}
+            disabled={!isAdmin}
+            showLabel={false}
+          />
+        </DateTimeGrid>
       </FormRow>
 
       {stock.map((item) => (

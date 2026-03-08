@@ -8,44 +8,55 @@ import { useScheme2ByItemId } from "../schemes/useScheme2ByItemId";
 import { useScheme3ByItemId } from "../schemes/useScheme3ByItemId";
 import toast from "react-hot-toast";
 
-const Label = styled.label`
-  font-weight: 500;
-  font-size: 1.2rem;
-  position: absolute;
-  left: 2rem;
-  top: 0.4rem;
-  background-color: var(--color-grey-0);
-  padding: 0 0.3rem;
-`;
-const Stacked1 = styled.div`
-  display: flex;
-  justify-content: space-between;
-  padding: 0 1rem;
+const ItemCard = styled.div`
+  display: grid;
   gap: 1rem;
+  padding: 1rem 0.4rem 0.4rem;
+`;
 
-  & div {
-    width: 50%;
-    position: relative;
-    /* margin-top: 1rem; */
-    padding: 1.2rem 0 0 0;
-  }
-  & div:last-child {
-    margin-bottom: 1rem;
-  }
-`;
-const Stacked2 = styled.div`
+const ItemHeader = styled.div`
   display: flex;
   justify-content: space-between;
-  padding: 0 1rem;
+  align-items: center;
   gap: 1rem;
+  padding: 0 0.6rem;
 
   & span:first-child {
     font-weight: 600;
   }
-  & span:last-child {
-    font-size: smaller;
-    /* font-weight: 600; */
-  }
+`;
+
+const ItemMeta = styled.span`
+  font-size: 1.2rem;
+  color: var(--color-grey-500);
+`;
+
+const InputGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+  gap: 1rem;
+  padding: 0 0.6rem;
+`;
+
+const Field = styled.label`
+  display: grid;
+  gap: 0.4rem;
+  font-size: 1.1rem;
+  color: var(--color-grey-500);
+`;
+
+const SchemesRow = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  padding: 0 0.6rem;
+  align-items: center;
+`;
+
+const SchemeNote = styled.span`
+  font-size: 1.1rem;
+  color: var(--color-grey-500);
+  padding: 0 0.6rem;
 `;
 
 function CreateOrderItem({ item, newOrder, setNewOrder }) {
@@ -206,62 +217,60 @@ function CreateOrderItem({ item, newOrder, setNewOrder }) {
 
   return (
     <FormRow type="order">
-      <Stacked2>
-        <span>{item_name}</span>
-        <span>
-          Rs.{base_selling_price_per_pt} -- {available_pt} pt.
-        </span>
-      </Stacked2>
-      <Stacked1>
-        <div>
-          <Label htmlFor="quantity">quantity</Label>
-          <Input
-            type="text"
-            id="quantity"
-            value={quantity}
-            onChange={handleQuantityChange}
-            disabled={available_pt <= 0}
-          />
-        </div>
-        <div>
-          <Label htmlFor="discountPerPt">Discount/pt</Label>
-          <Input
-            type="text"
-            id="discountPerPt"
-            value={discountPerPt}
-            onChange={handleDiscountChange}
-            disabled={available_pt <= 0}
-          />
-        </div>
-      </Stacked1>
-
-      <Stacked2>
-        <Checkbox
-          id="scheme1"
-          checked={addScheme1}
-          onChange={handleAddScheme1Change}
-        >
-          Scm1
-        </Checkbox>
-        <Checkbox
-          id="scheme2"
-          checked={addScheme2}
-          onChange={handleAddScheme2Change}
-        >
-          Scm2
-        </Checkbox>
-        <Checkbox
-          id="scheme3"
-          checked={addScheme3}
-          onChange={handleAddScheme3Change}
-        >
-          Scm3
-        </Checkbox>
-        {/* {(addScheme1 || addScheme2) && <span>{freeItemsString}</span>} */}
-      </Stacked2>
-      <Stacked2>
-        {(addScheme1 || addScheme2) && <span>{freeItemsString}</span>}
-      </Stacked2>
+      <ItemCard>
+        <ItemHeader>
+          <span>{item_name}</span>
+          <ItemMeta>
+            Rs.{base_selling_price_per_pt} — {available_pt} pt.
+          </ItemMeta>
+        </ItemHeader>
+        <InputGrid>
+          <Field htmlFor={`quantity-${id}`}>
+            Quantity
+            <Input
+              type="text"
+              id={`quantity-${id}`}
+              value={quantity}
+              onChange={handleQuantityChange}
+              disabled={available_pt <= 0}
+            />
+          </Field>
+          <Field htmlFor={`discountPerPt-${id}`}>
+            Discount / pt
+            <Input
+              type="text"
+              id={`discountPerPt-${id}`}
+              value={discountPerPt}
+              onChange={handleDiscountChange}
+              disabled={available_pt <= 0}
+            />
+          </Field>
+        </InputGrid>
+        <SchemesRow>
+          <Checkbox
+            id={`scheme1-${id}`}
+            checked={addScheme1}
+            onChange={handleAddScheme1Change}
+          >
+            Scm1
+          </Checkbox>
+          <Checkbox
+            id={`scheme2-${id}`}
+            checked={addScheme2}
+            onChange={handleAddScheme2Change}
+          >
+            Scm2
+          </Checkbox>
+          <Checkbox
+            id={`scheme3-${id}`}
+            checked={addScheme3}
+            onChange={handleAddScheme3Change}
+          >
+            Scm3
+          </Checkbox>
+        </SchemesRow>
+        {(addScheme1 || addScheme2) && <SchemeNote>{freeItemsString}</SchemeNote>}
+      </ItemCard>
     </FormRow>
   );
 }

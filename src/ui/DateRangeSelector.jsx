@@ -37,6 +37,12 @@ function DateRangeSelector({
   onApply,
   onClear,
   onCloseModal,
+  showEndDate = true,
+  showActions = true,
+  startLabel = "Start date",
+  endLabel = "End date",
+  disabled = false,
+  showLabels = true,
 }) {
   const canApply = Boolean(startDate && endDate);
 
@@ -54,35 +60,43 @@ function DateRangeSelector({
     <div>
       <DateRangeForm>
         <DateRow>
-          Start date
+          {showLabels ? startLabel : null}
           <DateInput
             type="date"
             value={startDate}
             onChange={(event) => onStartDateChange?.(event.target.value)}
+            disabled={disabled}
+            aria-label={showLabels ? undefined : startLabel}
           />
         </DateRow>
-        <DateRow>
-          End date
-          <DateInput
-            type="date"
-            value={endDate}
-            onChange={(event) => onEndDateChange?.(event.target.value)}
-          />
-        </DateRow>
+        {showEndDate && (
+          <DateRow>
+            {showLabels ? endLabel : null}
+            <DateInput
+              type="date"
+              value={endDate}
+              onChange={(event) => onEndDateChange?.(event.target.value)}
+              disabled={disabled}
+              aria-label={showLabels ? undefined : endLabel}
+            />
+          </DateRow>
+        )}
       </DateRangeForm>
-      <ModalActions>
-        <Button variation="secondary" size="small" onClick={handleClear}>
-          Clear
-        </Button>
-        <Button
-          variation="primary"
-          size="small"
-          onClick={handleApply}
-          disabled={!canApply}
-        >
-          Apply
-        </Button>
-      </ModalActions>
+      {showActions && (
+        <ModalActions>
+          <Button variation="secondary" size="small" onClick={handleClear}>
+            Clear
+          </Button>
+          <Button
+            variation="primary"
+            size="small"
+            onClick={handleApply}
+            disabled={!canApply}
+          >
+            Apply
+          </Button>
+        </ModalActions>
+      )}
     </div>
   );
 }
